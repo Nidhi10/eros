@@ -1,0 +1,46 @@
+<div class="col-md-3 sidebar">
+  <%= form_tag merchants_index_path, :method => 'get', class: 'filter' do %>
+    <div class="panel panel-default">
+      <div class="panel-heading">Specializations</div>
+      <div class="panel-body">
+        <% Specialization.all.each do |a_value| %>
+          <div>
+          <%= label_tag a_value.name%>
+          <%= check_box_tag "specialization[]", a_value.id, selected_spec.include?(a_value.id.to_s)%></div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">Price Per Session</div>
+      <div class="panel-body">
+        <%= text_field_tag :price_rng, price_max, data: {'slider-value' => price_max} %>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">Rating</div>
+      <div class="panel-body">
+        <%= text_field_tag :ratings, rating_max, data: {'slider-value' => rating_max} %>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">Session Length(min)</div>
+      <div class="panel-body">
+        <%= text_field_tag :session_rng, session_max, data: {'slider-value' => session_max}%>
+      </div>
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">Availability</div>
+      <div class="panel-body">
+        <% availability.each do |k,v| %>
+          <div>
+          <%= label_tag k %>
+          <%= check_box_tag "available", v.call, selected_avail.include?(v.call.to_s) %></div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

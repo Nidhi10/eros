@@ -1,0 +1,27 @@
+<%= render 'shared/sorting'%>
+<div class="row">
+  <%= render 'shared/sidebar'%>
+  <div class="col-md-9 col-md-offset-3 content">
+    <% unless @merchant.blank? %>
+      <% @merchant.each do |merchant| %>
+        <div class="panel panel-info">
+          <div class="col-md-12 panel-heading">
+            <span class="col-md-3"><%= merchant.name %></span>
+            <span class="pull-right col-md-6">Rating: <%= merchant.avg_rating %></span>
+          </div>
+          <div class="panel-body">
+            <p><%= merchant.about %></p>
+            Specializations:
+            <% if merchant.specializations.is_a? Array%>
+              <%= merchant.specializations.map {|i| i.name}.join(',') %><br />
+            <% else %>
+              <%= merchant.specializations.pluck(:name).join(', ') %><br />
+            <% end %>
+            Price:<%= merchant.price %><br />
+            Reviews: <%= merchant.review_count %><br/>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
