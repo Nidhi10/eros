@@ -20,6 +20,9 @@ class Merchant < ActiveRecord::Base
       indexes :about, type: :string
       indexes :avg_rating, type: :float
       indexes :price, type: :float
+      indexes :specializations do
+        indexes :id, type: :integer
+      end
       indexes :suggest, type: 'completion',index_analyzer: 'simple',
           search_analyzer: 'simple',
           payloads: true
@@ -52,7 +55,7 @@ class Merchant < ActiveRecord::Base
     self.as_json(
         only: [:name, :about, :avg_rating, :price, :review_count],
         include: {
-            specializations: {only: :name}
+            specializations: {only: [:id, :name] }
         }
     ).merge(suggest)
   end
@@ -68,6 +71,42 @@ class Merchant < ActiveRecord::Base
               [{sort_column => { order: sort_direction }}]
     )
   end
+
+  def self.filter(filters,sort_column, sort_direction)
+    puts filters
+    applicable_filters = []
+    if filters[:price_rng].present?
+      if filters[:price_rng].to_i > 50
+        applicable_filters.push(range: {price: { gte: 50 }})
+      else
+        applicable_filters.push(range: {price: { lte: filters[:price_rng].to_i }})
+      end
+    end
+    if filters[:specialization].present?
+      applicable_filters.push(terms: {'specializations.id'  => filters[:specialization].map{|i| i.to_i}})
+    end
+
+    if filters[:ratings].present?
+      applicable_filters.push(range: {avg_rating: { lte: filters[:ratings].to_i }})
+    end
+    puts applicable_filters
+    if applicable_filters.size > 0
+      __elasticsearch__.search query: {
+                                   filtered: {
+                                       filter: {
+                                           bool: {
+                                               must: applicable_filters
+                                           }
+                                       }
+                                   }
+                               },
+                               sort: [{sort_column => { order: sort_direction }}]
+    else
+      __elasticsearch__.search query: {match_all: {}},
+                               sort: [{sort_column => { order: sort_direction }}]
+    end
+  end
+
 end
 
 Merchant.import force: true

@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(version: 20151027111300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "merchants", force: true do |t|
+  create_table "merchants", force: :cascade do |t|
     t.string   "name"
     t.string   "email"
     t.integer  "status",       default: 0
@@ -29,12 +29,12 @@ ActiveRecord::Schema.define(version: 20151027111300) do
     t.datetime "updated_at"
   end
 
-  create_table "merchants_specializations", id: false, force: true do |t|
+  create_table "merchants_specializations", id: false, force: :cascade do |t|
     t.integer "merchant_id",       null: false
     t.integer "specialization_id", null: false
   end
 
-  create_table "openings", force: true do |t|
+  create_table "openings", force: :cascade do |t|
     t.datetime "start_time"
     t.datetime "end_time"
     t.integer  "merchant_id"
@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20151027111300) do
 
   add_index "openings", ["merchant_id"], name: "index_openings_on_merchant_id", using: :btree
 
-  create_table "specializations", force: true do |t|
+  create_table "specializations", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
